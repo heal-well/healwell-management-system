@@ -22,14 +22,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontWeight: 'bold'
 }))
 
-const TherapistsTable = ({ data, fetchData, page, setPage }) => {
+const PatientsTable = ({ data, fetchData, page, setPage }) => {
   const [editMode, setEditMode] = useState(false)
   const [editedFields, setEditedFields] = useState({ ...data })
 
   const navigate = useNavigate()
 
   const handleCreate = () => {
-    navigate('/therapists/create')
+    navigate('/patients/create')
   }
 
   const handleEdit = () => {
@@ -77,15 +77,20 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
   const filteredFields = [
     'name',
     'phone',
+    'age',
     'address',
-    'hoursOfWork',
-    'image',
-    'workLocation',
-    'yearsOfExperience',
-    'specialization',
-    'college',
-    'languages'
+    'sex',
+    'painArea',
+    'dateOfInjury',
+    'surgeries',
+    'electricalModalities'
   ]
+
+  // Helper function to format date fields
+  const formatDate = dateString => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString()
+  }
 
   return (
     <>
@@ -153,6 +158,8 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
                             handleFieldChange(fieldName, e.target.value)
                           }
                         />
+                      ) : fieldName === 'dateOfInjury' ? (
+                        formatDate(value)
                       ) : (
                         value
                       )}
@@ -167,4 +174,4 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
   )
 }
 
-export default TherapistsTable
+export default PatientsTable

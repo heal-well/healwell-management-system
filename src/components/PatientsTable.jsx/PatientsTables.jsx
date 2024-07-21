@@ -10,20 +10,20 @@ import {
   TablePagination
 } from '@mui/material'
 import { styled } from '@mui/system'
-import TherapistsTable from './TherapistsTable'
+import PatientsTable from './PatientsTable'
 import axios from 'axios'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontWeight: 'bold'
 }))
 
-const TherapistsTables = () => {
+const PatientsTables = () => {
   const [data, setData] = useState([])
 
   async function fetchData () {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/therapists`
+        `${import.meta.env.VITE_API_URL}/api/patients`
       )
       const data = response.data
       setData(data)
@@ -48,11 +48,11 @@ const TherapistsTables = () => {
 
   return (
     <div>
-      <h2>Physiotherapists Information</h2>
+      <h2>Patients Information</h2>
       {data
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
         .map((data, index) => (
-          <TherapistsTable
+          <PatientsTable
             key={index}
             data={data}
             fetchData={fetchData}
@@ -72,4 +72,4 @@ const TherapistsTables = () => {
   )
 }
 
-export default TherapistsTables
+export default PatientsTables
