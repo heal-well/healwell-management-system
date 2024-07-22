@@ -15,10 +15,10 @@ const therapistsSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  image: {
-    type: String,
-    required: true
-  },
+  // image: {
+  //   type: String,
+  //   required: true
+  // },
   hoursOfWork: {
     type: String,
     required: true

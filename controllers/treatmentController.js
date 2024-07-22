@@ -15,6 +15,9 @@ export const createTreatment = async (req, res) => {
 export const getAllTreatments = async (req, res) => {
   try {
     const treatments = await Treatment.find()
+      .populate('patientId', 'name')
+      .populate('therapistId', 'name')
+      .populate('substitutedBy', 'name')
     if (!treatments) {
       res.status(404).json({ message: 'No treatments found' })
     }
