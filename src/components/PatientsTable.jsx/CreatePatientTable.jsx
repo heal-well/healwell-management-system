@@ -6,7 +6,11 @@ import {
   Typography,
   Paper,
   Grid,
-  IconButton
+  IconButton,
+  Select,
+  FormControl,
+  InputLabel,
+  MenuItem
 } from '@mui/material'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -50,7 +54,7 @@ const CreatePatientsTable = () => {
       )
       console.log('response: ', response)
       if (response) {
-        navigate('/')
+        navigate('/patients')
         console.log('Data created: ', response.data)
       }
     } catch (error) {
@@ -81,7 +85,10 @@ const CreatePatientsTable = () => {
             <Typography variant='h5' gutterBottom>
               Create Patient
             </Typography>
-            <IconButton onClick={() => navigate('/')} aria-label='Close'>
+            <IconButton
+              onClick={() => navigate('/patients')}
+              aria-label='Close'
+            >
               <CloseIcon />
             </IconButton>
           </div>
@@ -117,15 +124,25 @@ const CreatePatientsTable = () => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('sex', { required: true })}
-                  label='Sex'
-                  variant='outlined'
-                  fullWidth
-                  error={!!errors.sex}
-                  helperText={errors.sex ? 'Sex is required' : ''}
-                  onChange={handleChange}
-                />
+                <FormControl fullWidth variant='outlined' error={!!errors.sex}>
+                  <InputLabel>Sex</InputLabel>
+
+                  <Select
+                    {...register('sex', { required: true })}
+                    label='Sex'
+                    value={formData.sex}
+                    onChange={handleChange}
+                    name='sex'
+                  >
+                    <MenuItem value='Male'>Male</MenuItem>
+                    <MenuItem value='Female'>Female</MenuItem>
+                  </Select>
+                </FormControl>
+                {errors.sex && (
+                  <Typography variant='caption' color='error'>
+                    Sex is required
+                  </Typography>
+                )}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
