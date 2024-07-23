@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   TextField,
@@ -20,6 +20,9 @@ import axios from 'axios'
 
 const CreateSessionTable = () => {
   const navigate = useNavigate()
+  const [patients, setPatients] = useState([])
+  const [therapists, setTherapists] = useState([])
+
   const {
     register,
     handleSubmit,
@@ -27,13 +30,43 @@ const CreateSessionTable = () => {
     formState: { errors }
   } = useForm()
 
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/patients`
+        )
+        setPatients(response.data)
+      } catch (error) {
+        console.error('Error fetching patients: ', error)
+      }
+    }
+
+    const fetchTherapists = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/therapists`
+        )
+        setTherapists(response.data)
+      } catch (error) {
+        console.error('Error fetching therapists: ', error)
+      }
+    }
+
+    fetchPatients()
+    fetchTherapists()
+  }, [])
+
   const onSubmit = async data => {
     console.log('formData: ', data)
     try {
-      const response = await axios.post('/api/treatments', data)
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/treatments`,
+        data
+      )
       console.log('response: ', response)
       if (response) {
-        navigate('/admin/treatments')
+        navigate('/treatments')
       }
     } catch (error) {
       console.error('Error creating data: ', error)
@@ -80,26 +113,64 @@ const CreateSessionTable = () => {
           >
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('patientId', { required: true })}
-                  label='Patient ID'
-                  variant='outlined'
-                  fullWidth
-                  error={!!errors.patientId}
-                  helperText={errors.patientId ? 'Patient ID is required' : ''}
-                />
+                <FormControl fullWidth>
+                  <InputLabel id='patientId-label'>Patient ID</InputLabel>
+                  <Controller
+                    name='patientId'
+                    control={control}
+                    defaultValue=''
+                    rules={{ required: 'Patient ID is required' }}
+                    render={({ field }) => (
+                      <Select
+                        labelId='patientId-label'
+                        label='Patient ID'
+                        {...field}
+                        error={!!errors.patientId}
+                      >
+                        {patients.map(patient => (
+                          <MenuItem key={patient._id} value={patient._id}>
+                            {patient.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                  {errors.patientId && (
+                    <Typography color='error'>
+                      {errors.patientId.message}
+                    </Typography>
+                  )}
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('therapistId', { required: true })}
-                  label='Therapist ID'
-                  variant='outlined'
-                  fullWidth
-                  error={!!errors.therapistId}
-                  helperText={
-                    errors.therapistId ? 'Therapist ID is required' : ''
-                  }
-                />
+                <FormControl fullWidth>
+                  <InputLabel id='therapistId-label'>Therapist ID</InputLabel>
+                  <Controller
+                    name='therapistId'
+                    control={control}
+                    defaultValue=''
+                    rules={{ required: 'Therapist ID is required' }}
+                    render={({ field }) => (
+                      <Select
+                        labelId='therapistId-label'
+                        label='Therapist ID'
+                        {...field}
+                        error={!!errors.therapistId}
+                      >
+                        {therapists.map(therapist => (
+                          <MenuItem key={therapist._id} value={therapist._id}>
+                            {therapist.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                  {errors.therapistId && (
+                    <Typography color='error'>
+                      {errors.therapistId.message}
+                    </Typography>
+                  )}
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -154,16 +225,36 @@ const CreateSessionTable = () => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('substitutedBy', { required: true })}
-                  label='Substituted By'
-                  variant='outlined'
-                  fullWidth
-                  error={!!errors.substitutedBy}
-                  helperText={
-                    errors.substitutedBy ? 'Substituted By is required' : ''
-                  }
-                />
+                <FormControl fullWidth>
+                  <InputLabel id='substitutedBy-label'>
+                    Substituted By
+                  </InputLabel>
+                  <Controller
+                    name='substitutedBy'
+                    control={control}
+                    defaultValue=''
+                    rules={{ required: 'Substituted By is required' }}
+                    render={({ field }) => (
+                      <Select
+                        labelId='substitutedBy-label'
+                        label='Substituted By'
+                        {...field}
+                        error={!!errors.substitutedBy}
+                      >
+                        {therapists.map(therapist => (
+                          <MenuItem key={therapist._id} value={therapist._id}>
+                            {therapist.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    )}
+                  />
+                  {errors.substitutedBy && (
+                    <Typography color='error'>
+                      {errors.substitutedBy.message}
+                    </Typography>
+                  )}
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth>

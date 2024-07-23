@@ -16,6 +16,7 @@ import { styled } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import SaveIcon from '@mui/icons-material/Save'
 import axios from 'axios'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -23,8 +24,8 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }))
 
 const TherapistsTable = ({ data, fetchData, page, setPage }) => {
-  const [editMode, setEditMode] = useState(false)
-  const [editedFields, setEditedFields] = useState({ ...data })
+  const [editMode, setEditMode] = useState(null)
+  const [editedFields, setEditedFields] = useState({})
 
   const navigate = useNavigate()
 
@@ -32,8 +33,9 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
     navigate('/therapists/create')
   }
 
-  const handleEdit = () => {
-    setEditMode(!editMode)
+  const handleEdit = id => {
+    setEditMode(id)
+    setEditedFields(data.find(item => item._id === id) || {})
   }
 
   const handleFieldChange = (field, value) => {
@@ -43,11 +45,10 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
     })
   }
 
-  const handleSave = async () => {
+  const handleSave = async id => {
     try {
-      const userId = data._id
       const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/therapists/${userId}`,
+        `${import.meta.env.VITE_API_URL}/api/therapists/${id}`,
         editedFields
       )
       console.log('Data saved: ', response.data)
@@ -55,15 +56,14 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
     } catch (error) {
       console.error('Error saving data: ', error)
     }
-    // Set edit mode to false to exit editing mode
-    setEditMode(false)
+    // Set edit mode to null to exit editing mode
+    setEditMode(null)
   }
 
-  const handleDelete = async () => {
-    const userId = data._id
+  const handleDelete = async id => {
     try {
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/therapists/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/therapists/${id}`
       )
       console.log('Data deleted: ', response.data)
       setPage(page - 1)
@@ -100,66 +100,66 @@ const TherapistsTable = ({ data, fetchData, page, setPage }) => {
         >
           Create
         </Button>
-        <Button
-          variant='contained'
-          color='primary'
-          startIcon={<EditIcon />}
-          onClick={handleEdit}
-          style={{ marginLeft: '8px' }}
-        >
-          {editMode ? 'Cancel' : 'Edit'}
-        </Button>
-        {editMode && (
-          <Button
-            variant='contained'
-            color='primary'
-            startIcon={<EditIcon />}
-            onClick={handleSave}
-            style={{ marginLeft: '8px' }}
-          >
-            Save
-          </Button>
-        )}
-        <Button
-          variant='contained'
-          color='secondary'
-          startIcon={<DeleteIcon />}
-          onClick={handleDelete}
-          style={{ marginLeft: '8px' }}
-        >
-          Delete
-        </Button>
       </div>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <StyledTableCell>Field Name</StyledTableCell>
-              <StyledTableCell>Value</StyledTableCell>
+              <StyledTableCell>Name</StyledTableCell>
+              <StyledTableCell>Phone</StyledTableCell>
+              <StyledTableCell>Address</StyledTableCell>
+              <StyledTableCell>Hours of Work</StyledTableCell>
+              <StyledTableCell>Image</StyledTableCell>
+              <StyledTableCell>Work Location</StyledTableCell>
+              <StyledTableCell>Years of Experience</StyledTableCell>
+              <StyledTableCell>Specialization</StyledTableCell>
+              <StyledTableCell>College</StyledTableCell>
+              <StyledTableCell>Languages</StyledTableCell>
+              <StyledTableCell>Actions</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {Object.entries(data).map(
-              ([fieldName, value], index) =>
-                // Check if the field is in the filteredFields array
-                filteredFields.includes(fieldName) && (
-                  <TableRow key={index}>
-                    <StyledTableCell>{fieldName}</StyledTableCell>
-                    <TableCell>
-                      {editMode ? (
-                        <TextField
-                          value={editedFields[fieldName]}
-                          onChange={e =>
-                            handleFieldChange(fieldName, e.target.value)
-                          }
-                        />
-                      ) : (
-                        value
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )
-            )}
+            {data.map(row => (
+              <TableRow key={row._id}>
+                {filteredFields.map(field => (
+                  <TableCell key={field}>
+                    {editMode === row._id ? (
+                      <TextField
+                        value={editedFields[field] || ''}
+                        onChange={e => handleFieldChange(field, e.target.value)}
+                      />
+                    ) : (
+                      row[field]
+                    )}
+                  </TableCell>
+                ))}
+                <TableCell>
+                  {editMode === row._id ? (
+                    <IconButton
+                      aria-label='save'
+                      onClick={() => handleSave(row._id)}
+                    >
+                      <SaveIcon />
+                    </IconButton>
+                  ) : (
+                    <>
+                      <IconButton
+                        aria-label='edit'
+                        onClick={() => handleEdit(row._id)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        aria-label='delete'
+                        onClick={() => handleDelete(row._id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

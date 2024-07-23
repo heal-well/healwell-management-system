@@ -17,10 +17,40 @@ import {
 } from '@mui/material'
 import { Edit, Delete, Add, Save } from '@mui/icons-material'
 import axios from 'axios'
+
 const SessionTable = ({ treatments, fetchData }) => {
   const navigate = useNavigate()
   const [editMode, setEditMode] = useState(null)
   const [editedFields, setEditedFields] = useState({})
+  const [therapists, setTherapists] = useState([])
+  const [patients, setPatients] = useState([])
+
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/therapists`
+        )
+        setTherapists(response.data)
+      } catch (error) {
+        console.error('Error fetching therapists: ', error)
+      }
+    }
+
+    const fetchPatients = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/patients`
+        )
+        setPatients(response.data)
+      } catch (error) {
+        console.error('Error fetching patients: ', error)
+      }
+    }
+
+    fetchTherapists()
+    fetchPatients()
+  }, [])
 
   const handleChange = (e, index) => {
     const { name, value } = e.target
@@ -65,14 +95,11 @@ const SessionTable = ({ treatments, fetchData }) => {
     } catch (error) {
       console.error('Error deleting treatment: ', error)
     }
-    App
   }
 
   const handleCreate = () => {
-    navigate('/admin/treatments/create')
+    navigate('/treatments/create')
   }
-
-  useEffect(() => {}, [treatments])
 
   return (
     <>
@@ -112,26 +139,42 @@ const SessionTable = ({ treatments, fetchData }) => {
               <TableRow key={index}>
                 <TableCell>
                   {editMode === index ? (
-                    <TextField
-                      type='text'
-                      name='patientName'
-                      value={editedFields[index]?.patientName || ''}
+                    <Select
+                      name='patientId'
+                      value={
+                        editedFields[index]?.patientId ||
+                        treatment.patientId._id
+                      }
                       onChange={e => handleChange(e, index)}
-                    />
+                    >
+                      {patients.map(patient => (
+                        <MenuItem key={patient._id} value={patient._id}>
+                          {patient.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   ) : (
-                    treatment.patientName
+                    treatment.patientId.name
                   )}
                 </TableCell>
                 <TableCell>
                   {editMode === index ? (
-                    <TextField
-                      type='text'
-                      name='therapistName'
-                      value={editedFields[index]?.therapistName || ''}
+                    <Select
+                      name='therapistId'
+                      value={
+                        editedFields[index]?.therapistId ||
+                        treatment.therapistId._id
+                      }
                       onChange={e => handleChange(e, index)}
-                    />
+                    >
+                      {therapists.map(therapist => (
+                        <MenuItem key={therapist._id} value={therapist._id}>
+                          {therapist.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   ) : (
-                    treatment.therapistName
+                    treatment.therapistId.name
                   )}
                 </TableCell>
                 <TableCell>
@@ -139,7 +182,15 @@ const SessionTable = ({ treatments, fetchData }) => {
                     <TextField
                       type='date'
                       name='treatmentDate'
-                      value={editedFields[index]?.treatmentDate || ''}
+                      value={
+                        editedFields[index]?.treatmentDate
+                          ? new Date(editedFields[index].treatmentDate)
+                              .toISOString()
+                              .split('T')[0]
+                          : new Date(treatment.treatmentDate)
+                              .toISOString()
+                              .split('T')[0]
+                      }
                       onChange={e => handleChange(e, index)}
                     />
                   ) : (
@@ -151,7 +202,10 @@ const SessionTable = ({ treatments, fetchData }) => {
                     <TextField
                       type='text'
                       name='treatmentType'
-                      value={editedFields[index]?.treatmentType || ''}
+                      value={
+                        editedFields[index]?.treatmentType ||
+                        treatment.treatmentType
+                      }
                       onChange={e => handleChange(e, index)}
                     />
                   ) : (
@@ -163,7 +217,10 @@ const SessionTable = ({ treatments, fetchData }) => {
                     <TextField
                       type='number'
                       name='daysAttended'
-                      value={editedFields[index]?.daysAttended || ''}
+                      value={
+                        editedFields[index]?.daysAttended ||
+                        treatment.daysAttended
+                      }
                       onChange={e => handleChange(e, index)}
                     />
                   ) : (
@@ -175,7 +232,10 @@ const SessionTable = ({ treatments, fetchData }) => {
                     <TextField
                       type='number'
                       name='daysSubstituted'
-                      value={editedFields[index]?.daysSubstituted || ''}
+                      value={
+                        editedFields[index]?.daysSubstituted ||
+                        treatment.daysSubstituted
+                      }
                       onChange={e => handleChange(e, index)}
                     />
                   ) : (
@@ -184,14 +244,23 @@ const SessionTable = ({ treatments, fetchData }) => {
                 </TableCell>
                 <TableCell>
                   {editMode === index ? (
-                    <TextField
-                      type='text'
+                    <Select
                       name='substitutedBy'
-                      value={editedFields[index]?.substitutedBy || ''}
+                      value={
+                        editedFields[index]?.substitutedBy ||
+                        treatment.substitutedBy?._id ||
+                        ''
+                      }
                       onChange={e => handleChange(e, index)}
-                    />
+                    >
+                      {therapists.map(therapist => (
+                        <MenuItem key={therapist._id} value={therapist._id}>
+                          {therapist.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
                   ) : (
-                    treatment.substitutedBy
+                    treatment.substitutedBy?.name || 'N/A'
                   )}
                 </TableCell>
                 <TableCell>
