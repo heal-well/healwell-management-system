@@ -20,10 +20,14 @@ const therapistsSchema = new mongoose.Schema({
   //   required: true
   // },
   hoursOfWork: {
-    type: String,
+    type: Number,
     required: true
   },
   workLocation: {
+    type: String,
+    required: true
+  },
+  timeSlot: {
     type: String,
     required: true
   },
