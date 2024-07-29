@@ -58,6 +58,9 @@ const CreateSessionTable = () => {
   }, [])
 
   const onSubmit = async data => {
+    if (data.substitutedBy === 'none') {
+      data.substitutedBy = null
+    }
     console.log('formData: ', data)
     try {
       const response = await axios.post(
@@ -232,8 +235,8 @@ const CreateSessionTable = () => {
                   <Controller
                     name='substitutedBy'
                     control={control}
-                    defaultValue=''
-                    rules={{ required: 'Substituted By is required' }}
+                    defaultValue='none'
+                    rules={{ required: false }}
                     render={({ field }) => (
                       <Select
                         labelId='substitutedBy-label'
@@ -241,6 +244,7 @@ const CreateSessionTable = () => {
                         {...field}
                         error={!!errors.substitutedBy}
                       >
+                        <MenuItem value='none'>None</MenuItem>
                         {therapists.map(therapist => (
                           <MenuItem key={therapist._id} value={therapist._id}>
                             {therapist.name}

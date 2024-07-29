@@ -6,9 +6,13 @@ import {
   Typography,
   Paper,
   Grid,
-  IconButton
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import DefaultLayout from '../../layout/DefaultLayout'
@@ -19,6 +23,7 @@ const CreateTherapistsTable = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors }
   } = useForm()
 
@@ -31,7 +36,8 @@ const CreateTherapistsTable = () => {
     phone: '',
     specialization: '',
     workLocation: '',
-    yearsOfExperience: ''
+    yearsOfExperience: '',
+    timeSlot: ''
   })
 
   const handleChange = e => {
@@ -136,6 +142,39 @@ const CreateTherapistsTable = () => {
                   }
                   onChange={handleChange}
                 />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id='timeslot-label'>Time Slot</InputLabel>
+                  <Controller
+                    name='timeSlot'
+                    control={control}
+                    defaultValue='none'
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        labelId='timeslot-label'
+                        label='Time Slot'
+                        {...field}
+                        error={!!errors.timeSlot}
+                      >
+                        <MenuItem value='6AM-8AM'>6AM-8AM</MenuItem>
+                        <MenuItem value='8AM-10AM'>8AM-10AM</MenuItem>
+                        <MenuItem value='10AM-12PM'>10AM-12PM</MenuItem>
+                        <MenuItem value='12PM-2PM'>12PM-2PM</MenuItem>
+                        <MenuItem value='2PM-4PM'>2PM-4PM</MenuItem>
+                        <MenuItem value='4PM-6PM'>4PM-6PM</MenuItem>
+                        <MenuItem value='6PM-8PM'>6PM-8PM</MenuItem>
+                        <MenuItem value='8PM-10PM'>8PM-10PM</MenuItem>
+                      </Select>
+                    )}
+                  />
+                  {errors.substitutedBy && (
+                    <Typography color='error'>
+                      {errors.substitutedBy.message}
+                    </Typography>
+                  )}
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField

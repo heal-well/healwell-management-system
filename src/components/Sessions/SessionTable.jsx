@@ -13,9 +13,10 @@ import {
   Box,
   TextField,
   MenuItem,
-  Select
+  Select,
+  Container
 } from '@mui/material'
-import { Edit, Delete, Add, Save } from '@mui/icons-material'
+import { Edit, Delete, Add, Save, AddCircle } from '@mui/icons-material'
 import axios from 'axios'
 
 const SessionTable = ({ treatments, fetchData }) => {
@@ -101,6 +102,43 @@ const SessionTable = ({ treatments, fetchData }) => {
     navigate('/treatments/create')
   }
 
+  const handleIncrementDaysAttended = async (treatment, index) => {
+    try {
+      const treatmentId = treatment._id
+      const therapistId = treatment.therapistId?._id
+
+      const updatedTreatment = {
+        ...treatment,
+        daysAttended: (treatment.daysAttended || 0) + 1
+      }
+
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/treatments/${treatmentId}`,
+        updatedTreatment
+      )
+
+      if (therapistId) {
+        const therapistResponse = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`
+        )
+        const therapist = therapistResponse.data
+
+        const updatedHours = {
+          hoursOfWork: (therapist.hoursOfWork || 0) + 1
+        }
+
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`,
+          updatedHours
+        )
+      }
+
+      fetchData()
+    } catch (error) {
+      console.error('Error incrementing days attended: ', error)
+    }
+  }
+
   return (
     <>
       <Box
@@ -163,7 +201,7 @@ const SessionTable = ({ treatments, fetchData }) => {
                       name='therapistId'
                       value={
                         editedFields[index]?.therapistId ||
-                        treatment.therapistId._id
+                        treatment?.therapistId?._id
                       }
                       onChange={e => handleChange(e, index)}
                     >
@@ -174,7 +212,7 @@ const SessionTable = ({ treatments, fetchData }) => {
                       ))}
                     </Select>
                   ) : (
-                    treatment.therapistId.name
+                    treatment?.therapistId?.name
                   )}
                 </TableCell>
                 <TableCell>
@@ -214,17 +252,35 @@ const SessionTable = ({ treatments, fetchData }) => {
                 </TableCell>
                 <TableCell>
                   {editMode === index ? (
-                    <TextField
-                      type='number'
-                      name='daysAttended'
-                      value={
-                        editedFields[index]?.daysAttended ||
-                        treatment.daysAttended
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
+                    <>
+                      <TextField
+                        type='number'
+                        name='daysAttended'
+                        value={
+                          editedFields[index]?.daysAttended ||
+                          treatment.daysAttended
+                        }
+                        onChange={e => handleChange(e, index)}
+                      />
+                      <IconButton
+                        onClick={() =>
+                          handleIncrementDaysAttended(treatment, index)
+                        }
+                      >
+                        <AddCircle />
+                      </IconButton>
+                    </>
                   ) : (
-                    treatment.daysAttended
+                    <>
+                      {treatment.daysAttended}
+                      <IconButton
+                        onClick={() =>
+                          handleIncrementDaysAttended(treatment, index)
+                        }
+                      >
+                        <AddCircle />
+                      </IconButton>
+                    </>
                   )}
                 </TableCell>
                 <TableCell>

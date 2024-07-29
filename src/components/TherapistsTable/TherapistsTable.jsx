@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Table,
@@ -8,152 +8,297 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
   Button,
-  TextField
+  IconButton,
+  Box,
+  TextField,
+  MenuItem,
+  Select
 } from '@mui/material'
-import { styled } from '@mui/system'
-import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
+import { Edit, Delete, Add, Save } from '@mui/icons-material'
 import axios from 'axios'
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontWeight: 'bold'
-}))
+const TherapistsTable = ({ fetchData }) => {
+  const navigate = useNavigate()
 
-const TherapistsTable = ({ data, fetchData, page, setPage }) => {
   const [editMode, setEditMode] = useState(null)
   const [editedFields, setEditedFields] = useState({})
+  const [therapists, setTherapists] = useState([])
+  const [sortOrder, setSortOrder] = useState('desc')
 
-  const navigate = useNavigate()
+  useEffect(() => {
+    fetchTherapists()
+  }, [])
+
+  const fetchTherapists = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/therapists`
+      )
+      setTherapists(response.data)
+    } catch (error) {
+      console.error('Error fetching therapists: ', error)
+    }
+  }
+
+  const handleChange = (e, index) => {
+    const { name, value } = e.target
+    setEditedFields(prevFields => ({
+      ...prevFields,
+      [index]: {
+        ...prevFields[index],
+        [name]: value
+      }
+    }))
+  }
+
+  const handleEdit = index => {
+    setEditMode(index)
+    setEditedFields({ ...editedFields, [index]: { ...therapists[index] } })
+  }
+
+  const handleSave = async (therapist, index) => {
+    try {
+      const therapistId = therapist._id
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`,
+        editedFields[index]
+      )
+      console.log('Data saved: ', response.data)
+      setEditMode(null)
+      setEditedFields({})
+      fetchTherapists()
+    } catch (error) {
+      console.error('Error saving data: ', error)
+    }
+  }
+
+  const handleDelete = async therapist => {
+    try {
+      const therapistId = therapist._id
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`
+      )
+      console.log('Therapist deleted:', therapist)
+      fetchTherapists()
+    } catch (error) {
+      console.error('Error deleting therapist: ', error)
+    }
+  }
 
   const handleCreate = () => {
     navigate('/therapists/create')
   }
 
-  const handleEdit = id => {
-    setEditMode(id)
-    setEditedFields(data.find(item => item._id === id) || {})
-  }
-
-  const handleFieldChange = (field, value) => {
-    setEditedFields({
-      ...editedFields,
-      [field]: value
+  const handleSort = () => {
+    const sortedData = [...therapists].sort((a, b) => {
+      if (sortOrder === 'desc') {
+        return b.hoursOfWork - a.hoursOfWork
+      } else {
+        return a.hoursOfWork - b.hoursOfWork
+      }
     })
+    setTherapists(sortedData)
+    setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')
   }
-
-  const handleSave = async id => {
-    try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/therapists/${id}`,
-        editedFields
-      )
-      console.log('Data saved: ', response.data)
-      fetchData()
-    } catch (error) {
-      console.error('Error saving data: ', error)
-    }
-    // Set edit mode to null to exit editing mode
-    setEditMode(null)
-  }
-
-  const handleDelete = async id => {
-    try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/therapists/${id}`
-      )
-      console.log('Data deleted: ', response.data)
-      setPage(page - 1)
-      fetchData()
-    } catch (error) {
-      console.error('Error deleting data: ', error)
-    }
-  }
-
-  // Filtered fields to display
-  const filteredFields = [
-    'name',
-    'phone',
-    'address',
-    'hoursOfWork',
-    'image',
-    'workLocation',
-    'yearsOfExperience',
-    'specialization',
-    'college',
-    'languages'
-  ]
 
   return (
     <>
-      <div
-        style={{ marginBottom: '16px', display: 'flex', justifyContent: 'end' }}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginBottom: 2
+        }}
       >
         <Button
+          sx={{ width: 120 }}
           variant='contained'
           color='primary'
-          startIcon={<AddIcon />}
+          startIcon={<Add />}
           onClick={handleCreate}
         >
           Create
         </Button>
-      </div>
+        <Button
+          sx={{ width: 120, height: 40, marginLeft: 2 }}
+          variant='contained'
+          color='primary'
+          onClick={handleSort}
+        >
+          Sort
+        </Button>
+      </Box>
+
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <StyledTableCell>Name</StyledTableCell>
-              <StyledTableCell>Phone</StyledTableCell>
-              <StyledTableCell>Address</StyledTableCell>
-              <StyledTableCell>Hours of Work</StyledTableCell>
-              <StyledTableCell>Image</StyledTableCell>
-              <StyledTableCell>Work Location</StyledTableCell>
-              <StyledTableCell>Years of Experience</StyledTableCell>
-              <StyledTableCell>Specialization</StyledTableCell>
-              <StyledTableCell>College</StyledTableCell>
-              <StyledTableCell>Languages</StyledTableCell>
-              <StyledTableCell>Actions</StyledTableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Address</TableCell>
+              <TableCell>Hours of Work</TableCell>
+              <TableCell>Work Location</TableCell>
+              <TableCell>Time Slot</TableCell>
+              <TableCell>Years of Experience</TableCell>
+              <TableCell>College</TableCell>
+              <TableCell>Specialization</TableCell>
+              {/* <TableCell>Languages</TableCell> */}
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map(row => (
-              <TableRow key={row._id}>
-                {filteredFields.map(field => (
-                  <TableCell key={field}>
-                    {editMode === row._id ? (
-                      <TextField
-                        value={editedFields[field] || ''}
-                        onChange={e => handleFieldChange(field, e.target.value)}
-                      />
-                    ) : (
-                      row[field]
-                    )}
-                  </TableCell>
-                ))}
+            {therapists.map((therapist, index) => (
+              <TableRow key={index}>
                 <TableCell>
-                  {editMode === row._id ? (
+                  {editMode === index ? (
+                    <TextField
+                      name='name'
+                      value={editedFields[index]?.name || therapist.name}
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.name
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      type='number'
+                      name='phone'
+                      value={editedFields[index]?.phone || therapist.phone}
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.phone
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='address'
+                      value={editedFields[index]?.address || therapist.address}
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.address
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='hoursOfWork'
+                      value={
+                        editedFields[index]?.hoursOfWork ||
+                        therapist.hoursOfWork
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.hoursOfWork
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='workLocation'
+                      value={
+                        editedFields[index]?.workLocation ||
+                        therapist.workLocation
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.workLocation
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='timeSlot'
+                      value={
+                        editedFields[index]?.timeSlot || therapist.timeSlot
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.timeSlot
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      type='number'
+                      name='yearsOfExperience'
+                      value={
+                        editedFields[index]?.yearsOfExperience ||
+                        therapist.yearsOfExperience
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.yearsOfExperience
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='college'
+                      value={editedFields[index]?.college || therapist.college}
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.college
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='specialization'
+                      value={
+                        editedFields[index]?.specialization ||
+                        therapist.specialization
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.specialization || 'N/A'
+                  )}
+                </TableCell>
+                {/* <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='languages'
+                      value={
+                        editedFields[index]?.languages || therapist.languages
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.languages
+                  )}
+                </TableCell> */}
+                <TableCell>
+                  {editMode === index ? (
                     <IconButton
                       aria-label='save'
-                      onClick={() => handleSave(row._id)}
+                      onClick={() => handleSave(therapist, index)}
                     >
-                      <SaveIcon />
+                      <Save />
                     </IconButton>
                   ) : (
                     <>
                       <IconButton
                         aria-label='edit'
-                        onClick={() => handleEdit(row._id)}
+                        onClick={() => handleEdit(index)}
                       >
-                        <EditIcon />
+                        <Edit />
                       </IconButton>
                       <IconButton
                         aria-label='delete'
-                        onClick={() => handleDelete(row._id)}
+                        onClick={() => handleDelete(therapist)}
                       >
-                        <DeleteIcon />
+                        <Delete />
                       </IconButton>
                     </>
                   )}
