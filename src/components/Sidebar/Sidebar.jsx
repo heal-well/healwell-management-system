@@ -58,9 +58,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className='flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5'>
-        <NavLink to='/admin'>
+        <NavLink to='/'>
           <h1 className='text-white text-xl text-center mx-2 font-bold px-2 py-1'>
-            Invoice Manager
+            Healwell Management
           </h1>
         </NavLink>
 
@@ -101,14 +101,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               {/* <!-- Menu Item Dashboard --> */}
               <SidebarLinkGroup
                 activeCondition={
-                  pathname === '/admin' || pathname.includes('dashboard')
+                  pathname === '/' || pathname.includes('dashboard')
                 }
               >
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
-                      <NavLink
-                        to='/admin'
+                      {/* <NavLink
+                        to='/'
                         className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
                           (pathname === '/admin' ||
                             pathname.includes('dashboard')) &&
@@ -139,9 +139,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                             fill=''
                           />
                         </svg>
-                      </NavLink>
+                      </NavLink> */}
                       {/* <!-- Dropdown Menu Start --> */}
-                      <div
+                      {/* <div
                         className={`translate transform overflow-hidden ${
                           !open && 'hidden'
                         }`}
@@ -149,7 +149,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <ul className='mt-4 mb-5.5 flex flex-col gap-2.5 pl-6'>
                           <li>
                             <NavLink
-                              to='/admin'
+                              to='/'
                               className={({ isActive }) =>
                                 'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
                                 (isActive && '!text-white')
@@ -159,7 +159,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                             </NavLink>
                           </li>
                         </ul>
-                      </div>
+                      </div> */}
                       {/* <!-- Dropdown Menu End --> */}
                     </React.Fragment>
                   )

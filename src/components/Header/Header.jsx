@@ -69,7 +69,7 @@ const Header = props => {
         <div className='flex items-center gap-3 2xsm:gap-7'>
           <h2 className='cursor-pointer'>Home</h2>
           <Link to='/about'>
-            <h2 className='cursor-pointer'>About invoicer</h2>
+            <h2 className='cursor-pointer'>About </h2>
           </Link>
           <Link to='/suggestion-box'>
             <h2 className='cursor-pointer'>Suggestion box</h2>

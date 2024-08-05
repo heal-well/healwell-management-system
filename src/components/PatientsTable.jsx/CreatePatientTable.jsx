@@ -104,18 +104,6 @@ const CreatePatientsTable = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('patientId', { required: true })}
-                  label='Patient ID'
-                  variant='outlined'
-                  fullWidth
-                  placeholder='DateEnrolled-SerialNumber-TherapistID'
-                  error={!!errors.patientId}
-                  helperText={errors.patientId ? 'Patient ID is required' : ''}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
                   {...register('name', { required: true })}
                   label='Name'
                   variant='outlined'
