@@ -6,6 +6,7 @@ export const createPatient = async (req, res) => {
     const patient = new Patients(data)
 
     await patient.save()
+    console.log('Patient Id created', patient.patientId)
     res.status(201).json(patient)
   } catch (error) {
     console.error('Error creating patient', error.message)
