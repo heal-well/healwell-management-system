@@ -1,7 +1,15 @@
 import mongoose from 'mongoose'
 
 const therapistsSchema = new mongoose.Schema({
-  name: {
+  therapistId: {
+    type: String,
+    unique: true
+  },
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
     type: String,
     required: true
   },
@@ -45,8 +53,25 @@ const therapistsSchema = new mongoose.Schema({
   languages: {
     type: String,
     required: true
+  },
+  patientsTreated: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Patients'
   }
 })
-const Therapists = mongoose.model('Therapists', therapistsSchema)
 
+therapistsSchema.pre('save', async function (next) {
+  if (this.isNew) {
+    const initials =
+      this.firstName.charAt(0).toUpperCase() +
+      this.lastName.charAt(0).toUpperCase()
+    const count = await mongoose.model('Therapists').countDocuments({
+      therapistId: new RegExp(`^${initials}`)
+    })
+    const idNumber = (count + 1).toString().padStart(4, '0')
+    this.therapistId = `${initials}${idNumber}`
+  }
+  next()
+})
+const Therapists = mongoose.model('Therapists', therapistsSchema)
 export default Therapists
