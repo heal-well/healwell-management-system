@@ -192,7 +192,7 @@ const SessionTable = ({ treatments, fetchData }) => {
                       ))}
                     </Select>
                   ) : (
-                    treatment.patientId.name
+                    treatment.patientId?.name
                   )}
                 </TableCell>
                 <TableCell>
@@ -207,12 +207,13 @@ const SessionTable = ({ treatments, fetchData }) => {
                     >
                       {therapists.map(therapist => (
                         <MenuItem key={therapist._id} value={therapist._id}>
-                          {therapist.name}
+                          {therapist?.firstName} {therapist?.lastName}{' '}
+                          {therapist?.therapistId}
                         </MenuItem>
                       ))}
                     </Select>
                   ) : (
-                    treatment?.therapistId?.name
+                    `${treatment?.therapistId?.firstName} ${treatment?.therapistId?.lastName} ${treatment?.therapistId?.therapistId}`
                   )}
                 </TableCell>
                 <TableCell>

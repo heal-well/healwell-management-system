@@ -11,9 +11,7 @@ import {
   Button,
   IconButton,
   Box,
-  TextField,
-  MenuItem,
-  Select
+  TextField
 } from '@mui/material'
 import { Edit, Delete, Add, Save } from '@mui/icons-material'
 import axios from 'axios'
@@ -60,11 +58,10 @@ const TherapistsTable = ({ fetchData }) => {
   const handleSave = async (therapist, index) => {
     try {
       const therapistId = therapist._id
-      const response = await axios.put(
+      await axios.put(
         `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`,
         editedFields[index]
       )
-      console.log('Data saved: ', response.data)
       setEditMode(null)
       setEditedFields({})
       fetchTherapists()
@@ -79,7 +76,6 @@ const TherapistsTable = ({ fetchData }) => {
       await axios.delete(
         `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`
       )
-      console.log('Therapist deleted:', therapist)
       fetchTherapists()
     } catch (error) {
       console.error('Error deleting therapist: ', error)
@@ -134,7 +130,9 @@ const TherapistsTable = ({ fetchData }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
+              <TableCell>Id</TableCell>
+              <TableCell>First name</TableCell>
+              <TableCell>Last name</TableCell>
               <TableCell>Phone</TableCell>
               <TableCell>Address</TableCell>
               <TableCell>Hours of Work</TableCell>
@@ -143,22 +141,37 @@ const TherapistsTable = ({ fetchData }) => {
               <TableCell>Years of Experience</TableCell>
               <TableCell>College</TableCell>
               <TableCell>Specialization</TableCell>
-              {/* <TableCell>Languages</TableCell> */}
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {therapists.map((therapist, index) => (
-              <TableRow key={index}>
+              <TableRow key={therapist._id}>
+                <TableCell>{therapist.therapistId}</TableCell>
                 <TableCell>
                   {editMode === index ? (
                     <TextField
-                      name='name'
-                      value={editedFields[index]?.name || therapist.name}
+                      name='firstName'
+                      value={
+                        editedFields[index]?.firstName || therapist.firstName
+                      }
                       onChange={e => handleChange(e, index)}
                     />
                   ) : (
-                    therapist.name
+                    therapist.firstName
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <TextField
+                      name='lastName'
+                      value={
+                        editedFields[index]?.lastName || therapist.lastName
+                      }
+                      onChange={e => handleChange(e, index)}
+                    />
+                  ) : (
+                    therapist.lastName
                   )}
                 </TableCell>
                 <TableCell>
@@ -265,19 +278,6 @@ const TherapistsTable = ({ fetchData }) => {
                     therapist.specialization || 'N/A'
                   )}
                 </TableCell>
-                {/* <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='languages'
-                      value={
-                        editedFields[index]?.languages || therapist.languages
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.languages
-                  )}
-                </TableCell> */}
                 <TableCell>
                   {editMode === index ? (
                     <IconButton

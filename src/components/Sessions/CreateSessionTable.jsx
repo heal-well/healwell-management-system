@@ -100,7 +100,7 @@ const CreateSessionTable = () => {
               Create Treatment
             </Typography>
             <IconButton
-              onClick={() => navigate('/admin/treatments')}
+              onClick={() => navigate('/treatments')}
               aria-label='Close'
             >
               <CloseIcon />
@@ -162,7 +162,8 @@ const CreateSessionTable = () => {
                       >
                         {therapists.map(therapist => (
                           <MenuItem key={therapist._id} value={therapist._id}>
-                            {therapist.name}
+                            {therapist.firstName} {therapist.lastName}(
+                            {therapist.therapistId})
                           </MenuItem>
                         ))}
                       </Select>
@@ -247,7 +248,8 @@ const CreateSessionTable = () => {
                         <MenuItem value='none'>None</MenuItem>
                         {therapists.map(therapist => (
                           <MenuItem key={therapist._id} value={therapist._id}>
-                            {therapist.name}
+                            {therapist?.firstName} {therapist?.lastName} (
+                            {therapist?.therapistId})
                           </MenuItem>
                         ))}
                       </Select>

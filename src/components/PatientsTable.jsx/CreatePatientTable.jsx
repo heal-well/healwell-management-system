@@ -27,6 +27,7 @@ const CreatePatientsTable = () => {
   } = useForm()
 
   const [formData, setFormData] = useState({
+    patientId: '',
     name: '',
     age: '',
     sex: '',
@@ -101,6 +102,18 @@ const CreatePatientsTable = () => {
             }}
           >
             <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register('patientId', { required: true })}
+                  label='Patient ID'
+                  variant='outlined'
+                  fullWidth
+                  placeholder='DateEnrolled-SerialNumber-TherapistID'
+                  error={!!errors.patientId}
+                  helperText={errors.patientId ? 'Patient ID is required' : ''}
+                  onChange={handleChange}
+                />
+              </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   {...register('name', { required: true })}
@@ -194,8 +207,12 @@ const CreatePatientsTable = () => {
                 <TextField
                   {...register('dateOfInjury', { required: true })}
                   type='date'
+                  label='Date of Injury'
                   variant='outlined'
                   fullWidth
+                  InputLabelProps={{
+                    shrink: true
+                  }}
                   error={!!errors.dateOfInjury}
                   helperText={
                     errors.dateOfInjury ? 'Date of injury is required' : ''

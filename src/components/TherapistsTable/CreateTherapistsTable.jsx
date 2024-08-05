@@ -27,34 +27,7 @@ const CreateTherapistsTable = () => {
     formState: { errors }
   } = useForm()
 
-  const [formData, setFormData] = useState({
-    address: '',
-    college: '',
-    hoursOfWork: '',
-    languages: '',
-    name: '',
-    phone: '',
-    specialization: '',
-    workLocation: '',
-    yearsOfExperience: '',
-    timeSlot: ''
-  })
-
-  const handleChange = e => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value
-    })
-  }
-
-  //   const handleFileChange = e => {
-  //     const file = e.target.files[0]
-  //     setFormData({
-  //       ...formData,
-  //       logo: file
-  //     })
-  //   }
+  const [createdTherapistId, setCreatedTherapistId] = useState(null)
 
   const onSubmit = async data => {
     try {
@@ -64,8 +37,9 @@ const CreateTherapistsTable = () => {
       )
       console.log('response: ', response)
       if (response) {
-        navigate('/')
+        setCreatedTherapistId(response.data.therapistId)
         console.log('Data created: ', response.data)
+        navigate('/')
       }
     } catch (error) {
       console.error('Error creating data: ', error)
@@ -110,13 +84,22 @@ const CreateTherapistsTable = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('name', { required: true })}
-                  label='Name'
+                  {...register('firstName', { required: true })}
+                  label='First Name'
                   variant='outlined'
                   fullWidth
-                  error={!!errors.name}
-                  helperText={errors.name ? 'Name is required' : ''}
-                  onChange={handleChange}
+                  error={!!errors.firstName}
+                  helperText={errors.firstName ? 'First name is required' : ''}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register('lastName', { required: true })}
+                  label='Last Name'
+                  variant='outlined'
+                  fullWidth
+                  error={!!errors.lastName}
+                  helperText={errors.lastName ? 'Last name is required' : ''}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -127,7 +110,6 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   error={!!errors.college}
                   helperText={errors.college ? 'College is required' : ''}
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -140,7 +122,6 @@ const CreateTherapistsTable = () => {
                   helperText={
                     errors.hoursOfWork ? 'Hours of work are required' : ''
                   }
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -169,9 +150,9 @@ const CreateTherapistsTable = () => {
                       </Select>
                     )}
                   />
-                  {errors.substitutedBy && (
+                  {errors.timeSlot && (
                     <Typography color='error'>
-                      {errors.substitutedBy.message}
+                      {errors.timeSlot.message}
                     </Typography>
                   )}
                 </FormControl>
@@ -184,7 +165,6 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   error={!!errors.languages}
                   helperText={errors.languages ? 'Languages are required' : ''}
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -195,7 +175,6 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   error={!!errors.phone}
                   helperText={errors.phone ? 'Phone is required' : ''}
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -208,7 +187,6 @@ const CreateTherapistsTable = () => {
                   helperText={
                     errors.specialization ? 'Specialization is required' : ''
                   }
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -221,7 +199,6 @@ const CreateTherapistsTable = () => {
                   helperText={
                     errors.workLocation ? 'Work location is required' : ''
                   }
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -236,7 +213,6 @@ const CreateTherapistsTable = () => {
                       ? 'Years of experience are required'
                       : ''
                   }
-                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -247,25 +223,8 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   error={!!errors.address}
                   helperText={errors.address ? 'Address is required' : ''}
-                  onChange={handleChange}
                 />
               </Grid>
-              {/* Uncomment the below code if you need file upload feature
-              <Grid item xs={12} sm={8}>
-                <Typography
-                  variant='body1'
-                  sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}
-                  gutterBottom
-                >
-                  Logo
-                  <input
-                    type='file'
-                    accept='image/*'
-                    onChange={handleFileChange}
-                  />
-                </Typography>
-              </Grid>
-              */}
             </Grid>
             <Button
               type='submit'
@@ -276,6 +235,11 @@ const CreateTherapistsTable = () => {
               Create
             </Button>
           </Box>
+          {createdTherapistId && (
+            <Typography variant='h6' color='primary' sx={{ mt: 2 }}>
+              Therapist created successfully! ID: {createdTherapistId}
+            </Typography>
+          )}
         </Paper>
       </Box>
     </DefaultLayout>

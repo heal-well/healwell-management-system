@@ -112,6 +112,7 @@ const PatientsTable = ({ fetchData }) => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>Patient ID</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Age</TableCell>
               <TableCell>Sex</TableCell>
@@ -127,6 +128,7 @@ const PatientsTable = ({ fetchData }) => {
           <TableBody>
             {patients.map((patient, index) => (
               <TableRow key={index}>
+                <TableCell>{patient.patientId}</TableCell>
                 <TableCell>
                   {editMode === index ? (
                     <TextField

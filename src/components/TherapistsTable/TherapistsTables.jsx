@@ -40,16 +40,16 @@ const TherapistsTables = () => {
   return (
     <div>
       <h2>Physiotherapists Information</h2>
-      {currentPageData.length > 0 ? (
-        <TherapistsTable
-          data={currentPageData[0]} // Pass the single therapist for the current page
-          fetchData={fetchData}
-          page={page}
-          setPage={setPage}
-        />
-      ) : (
-        <p>No data available</p>
-      )}
+      {/* {currentPageData.length > 0 ? ( */}
+      <TherapistsTable
+        data={currentPageData[0]} // Pass the single therapist for the current page
+        fetchData={fetchData}
+        page={page}
+        setPage={setPage}
+      />
+      {/* ) : ( */}
+      {/* <p>No data available</p>
+      )} */}
       <TablePagination
         component='div'
         count={data.length}
