@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import DefaultLayout from '../../layout/DefaultLayout'
 import axios from 'axios'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const CreatePatientsTable = () => {
   const navigate = useNavigate()
@@ -53,18 +55,22 @@ const CreatePatientsTable = () => {
         `${import.meta.env.VITE_API_URL}/api/patients`,
         data
       )
-      console.log('response: ', response)
       if (response) {
+        toast.success('Patient created successfully')
         navigate('/patients')
-        console.log('Data created: ', response.data)
       }
     } catch (error) {
-      console.error('Error creating data: ', error)
+      if (error.response && error.response.status === 400) {
+        toast.error('Patient with this phone number already exists')
+      } else {
+        toast.error('Error creating patient')
+      }
     }
   }
 
   return (
     <DefaultLayout>
+      <ToastContainer />
       <Box
         sx={{
           display: 'flex',
@@ -127,7 +133,6 @@ const CreatePatientsTable = () => {
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth variant='outlined' error={!!errors.sex}>
                   <InputLabel>Sex</InputLabel>
-
                   <Select
                     {...register('sex', { required: true })}
                     label='Sex'
