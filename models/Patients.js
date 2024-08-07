@@ -49,13 +49,19 @@ patientsSchema.pre('save', async function (next) {
   if (this.isNew) {
     const date = new Date()
     const year = date.getFullYear().toString()
-    const count = await mongoose.model('Patients').countDocuments({
-      patientId: new RegExp(`^${year}`)
-    })
-    const idNumber = (count + 1).toString().padStart(4, '0')
-    this.patientId = `${year}-${idNumber}`
+    try {
+      const count = await mongoose.model('Patients').countDocuments({
+        patientId: new RegExp(`^${year}`)
+      })
+      const idNumber = (count + 1).toString().padStart(4, '0')
+      this.patientId = `${year}-${idNumber}`
+      next()
+    } catch (error) {
+      next(error)
+    }
+  } else {
+    next()
   }
-  next()
 })
 
 const Patients = mongoose.model('Patients', patientsSchema)

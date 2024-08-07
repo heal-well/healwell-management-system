@@ -2,9 +2,16 @@ import Patients from '../models/Patients.js'
 
 export const createPatient = async (req, res) => {
   try {
-    const data = req.body
-    const patient = new Patients(data)
+    const { phone, ...data } = req.body
 
+    const existingPatient = await Patients.findOne({ phone })
+    if (existingPatient) {
+      return res
+        .status(400)
+        .json({ message: 'Patient with this phone number already exists' })
+    }
+
+    const patient = new Patients({ phone, ...data })
     await patient.save()
     console.log('Patient Id created', patient.patientId)
     res.status(201).json(patient)
