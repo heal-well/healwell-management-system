@@ -38,7 +38,7 @@ const CreatePatientsTable = () => {
     painArea: '',
     surgeries: '',
     dateOfInjury: '',
-    electricalModalities: ''
+    isPacemaker: false
   })
 
   const handleChange = e => {
@@ -214,19 +214,28 @@ const CreatePatientsTable = () => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register('electricalModalities', { required: true })}
-                  label='Electrical Modalities'
-                  variant='outlined'
+                <FormControl
                   fullWidth
-                  error={!!errors.electricalModalities}
-                  helperText={
-                    errors.electricalModalities
-                      ? 'Electrical modalities are required'
-                      : ''
-                  }
-                  onChange={handleChange}
-                />
+                  variant='outlined'
+                  error={!!errors.isPacemaker}
+                >
+                  <InputLabel>Pacemaker</InputLabel>
+                  <Select
+                    {...register('isPacemaker', { required: true })}
+                    label='Pacemaker'
+                    value={formData.isPacemaker}
+                    onChange={handleChange}
+                    name='isPacemaker'
+                  >
+                    <MenuItem value={true}>Yes</MenuItem>
+                    <MenuItem value={false}>No</MenuItem>
+                  </Select>
+                </FormControl>
+                {errors.isPacemaker && (
+                  <Typography variant='caption' color='error'>
+                    Pacemaker status is required
+                  </Typography>
+                )}
               </Grid>
             </Grid>
             <Button

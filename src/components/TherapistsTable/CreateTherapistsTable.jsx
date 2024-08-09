@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import DefaultLayout from '../../layout/DefaultLayout'
 import axios from 'axios'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const CreateTherapistsTable = () => {
   const navigate = useNavigate()
@@ -39,15 +41,22 @@ const CreateTherapistsTable = () => {
       if (response) {
         setCreatedTherapistId(response.data.therapistId)
         console.log('Data created: ', response.data)
+        toast.success('Therapist created successfully')
         navigate('/')
       }
     } catch (error) {
+      if (error.response && error.response.status === 400) {
+        toast.error('Therapist with this phone number already exists')
+      } else {
+        toast.error('Error creating therapist')
+      }
       console.error('Error creating data: ', error)
     }
   }
 
   return (
     <DefaultLayout>
+      <ToastContainer />
       <Box
         sx={{
           display: 'flex',

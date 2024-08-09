@@ -13,7 +13,9 @@ import {
   Box,
   TextField,
   MenuItem,
-  Select
+  Select,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material'
 import { Edit, Delete, Add, Save } from '@mui/icons-material'
 import axios from 'axios'
@@ -41,12 +43,12 @@ const PatientsTable = ({ fetchData }) => {
   }
 
   const handleChange = (e, index) => {
-    const { name, value } = e.target
+    const { name, value, checked, type } = e.target
     setEditedFields(prevFields => ({
       ...prevFields,
       [index]: {
         ...prevFields[index],
-        [name]: value
+        [name]: type === 'checkbox' ? checked : value
       }
     }))
   }
@@ -121,7 +123,7 @@ const PatientsTable = ({ fetchData }) => {
               <TableCell>Pain Area</TableCell>
               <TableCell>Surgeries</TableCell>
               <TableCell>Date of Injury</TableCell>
-              <TableCell>Electrical Modalities</TableCell>
+              <TableCell>Pacemaker</TableCell> {/* Updated */}
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -235,16 +237,23 @@ const PatientsTable = ({ fetchData }) => {
                 </TableCell>
                 <TableCell>
                   {editMode === index ? (
-                    <TextField
-                      name='electricalModalities'
-                      value={
-                        editedFields[index]?.electricalModalities ||
-                        patient.electricalModalities
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          name='isPacemaker'
+                          checked={
+                            editedFields[index]?.isPacemaker ||
+                            patient.isPacemaker
+                          }
+                          onChange={e => handleChange(e, index)}
+                        />
                       }
-                      onChange={e => handleChange(e, index)}
+                      label='Is Pacemaker'
                     />
+                  ) : patient.isPacemaker ? (
+                    'Yes'
                   ) : (
-                    patient.electricalModalities
+                    'No'
                   )}
                 </TableCell>
                 <TableCell>
