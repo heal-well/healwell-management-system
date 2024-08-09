@@ -39,8 +39,8 @@ const patientsSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  electricalModalities: {
-    type: String,
+  isPacemaker: {
+    type: Boolean,
     required: true
   }
 })

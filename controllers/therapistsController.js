@@ -2,8 +2,15 @@ import Therapists from '../models/Therapists.js'
 
 export const createTherapist = async (req, res) => {
   try {
-    const data = req.body
-    const therapist = new Therapists(data)
+    const { phone, ...data } = req.body
+
+    const existingTherapist = await Therapists.findOne({ phone })
+    if (existingTherapist) {
+      return res
+        .status(400)
+        .json({ message: 'Therapist with this phone number already exists' })
+    }
+    const therapist = new Therapists({ phone, ...data })
     await therapist.save()
     console.log('Therapist created: ', therapist.therapistId)
     res.status(201).json(therapist)
