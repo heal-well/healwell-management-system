@@ -6,24 +6,44 @@ import CreatePatientsTable from './components/PatientsTable.jsx/CreatePatientTab
 import Session from './pages/Session/Session'
 import CreateSessionTable from './components/Sessions/CreateSessionTable'
 import TherapistHistory from './pages/TherapistHistory/TherapistHistory'
+import SignIn from './pages/Authentication/Signin'
+import { AuthProvider } from './components/context/authContext'
+import PrivateRoute from './routes/PrivateRoutes/PrivateRoutes'
+
 function App () {
   return (
-    <>
+    <AuthProvider>
       <Router>
         <Routes>
-          <Route path='/' element={<AdminDashboard />} />
+          <Route path='/login' element={<SignIn />} />
+          <Route path='/' element={<PrivateRoute element={AdminDashboard} />} />
           <Route
             path='/therapists/create'
-            element={<CreateTherapistsTable />}
+            element={<PrivateRoute element={CreateTherapistsTable} />}
           />
-          <Route path='/patients' element={<Patients />} />
-          <Route path='/patients/create' element={<CreatePatientsTable />} />
-          <Route path='/treatments' element={<Session />} />
-          <Route path='/treatments/create' element={<CreateSessionTable />} />
-          <Route path='/history' element={<TherapistHistory />} />
+          <Route
+            path='/patients'
+            element={<PrivateRoute element={Patients} />}
+          />
+          <Route
+            path='/patients/create'
+            element={<PrivateRoute element={CreatePatientsTable} />}
+          />
+          <Route
+            path='/treatments'
+            element={<PrivateRoute element={Session} />}
+          />
+          <Route
+            path='/treatments/create'
+            element={<PrivateRoute element={CreateSessionTable} />}
+          />
+          <Route
+            path='/history'
+            element={<PrivateRoute element={TherapistHistory} />}
+          />
         </Routes>
       </Router>
-    </>
+    </AuthProvider>
   )
 }
 
