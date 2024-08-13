@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import AuthContext from '../../components/context/authContext'
@@ -16,15 +16,17 @@ const SignIn = () => {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
+
   const onSubmit = async data => {
     setSubmitting(true)
     setSubmitError(null)
     try {
       await login(data)
-
-      if (isAuthenticated) {
-        navigate('/')
-      }
     } catch (error) {
       console.error('Error during login', error.message)
       setSubmitError('login failed, please try again')
