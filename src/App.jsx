@@ -22,6 +22,10 @@ function App () {
             element={<PrivateRoute element={CreateTherapistsTable} />}
           />
           <Route
+            path='/therapists/edit/:id'
+            element={<PrivateRoute element={CreateTherapistsTable} />}
+          />
+          <Route
             path='/patients'
             element={<PrivateRoute element={Patients} />}
           />
@@ -30,11 +34,19 @@ function App () {
             element={<PrivateRoute element={CreatePatientsTable} />}
           />
           <Route
+            path='/patients/edit/:id'
+            element={<PrivateRoute element={CreatePatientsTable} />}
+          />
+          <Route
             path='/treatments'
             element={<PrivateRoute element={Session} />}
           />
           <Route
             path='/treatments/create'
+            element={<PrivateRoute element={CreateSessionTable} />}
+          />
+          <Route
+            path='/treatments/edit/:id'
             element={<PrivateRoute element={CreateSessionTable} />}
           />
           <Route

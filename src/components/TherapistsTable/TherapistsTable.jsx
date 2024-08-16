@@ -19,8 +19,6 @@ import axios from 'axios'
 const TherapistsTable = ({ fetchData }) => {
   const navigate = useNavigate()
 
-  const [editMode, setEditMode] = useState(null)
-  const [editedFields, setEditedFields] = useState({})
   const [therapists, setTherapists] = useState([])
   const [sortOrder, setSortOrder] = useState('desc')
 
@@ -39,35 +37,8 @@ const TherapistsTable = ({ fetchData }) => {
     }
   }
 
-  const handleChange = (e, index) => {
-    const { name, value } = e.target
-    setEditedFields(prevFields => ({
-      ...prevFields,
-      [index]: {
-        ...prevFields[index],
-        [name]: value
-      }
-    }))
-  }
-
-  const handleEdit = index => {
-    setEditMode(index)
-    setEditedFields({ ...editedFields, [index]: { ...therapists[index] } })
-  }
-
-  const handleSave = async (therapist, index) => {
-    try {
-      const therapistId = therapist._id
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`,
-        editedFields[index]
-      )
-      setEditMode(null)
-      setEditedFields({})
-      fetchTherapists()
-    } catch (error) {
-      console.error('Error saving data: ', error)
-    }
+  const handleEdit = therapist => {
+    navigate(`/therapists/edit/${therapist._id}`, { state: { therapist } })
   }
 
   const handleDelete = async therapist => {
@@ -145,163 +116,32 @@ const TherapistsTable = ({ fetchData }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {therapists.map((therapist, index) => (
+            {therapists.map(therapist => (
               <TableRow key={therapist._id}>
                 <TableCell>{therapist.therapistId}</TableCell>
+                <TableCell>{therapist.firstName}</TableCell>
+                <TableCell>{therapist.lastName}</TableCell>
+                <TableCell>{therapist.phone}</TableCell>
+                <TableCell>{therapist.address}</TableCell>
+                <TableCell>{therapist.hoursOfWork}</TableCell>
+                <TableCell>{therapist.workLocation}</TableCell>
+                <TableCell>{therapist.timeSlot}</TableCell>
+                <TableCell>{therapist.yearsOfExperience}</TableCell>
+                <TableCell>{therapist.college}</TableCell>
+                <TableCell>{therapist.specialization || 'N/A'}</TableCell>
                 <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='firstName'
-                      value={
-                        editedFields[index]?.firstName || therapist.firstName
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.firstName
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='lastName'
-                      value={
-                        editedFields[index]?.lastName || therapist.lastName
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.lastName
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      type='number'
-                      name='phone'
-                      value={editedFields[index]?.phone || therapist.phone}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.phone
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='address'
-                      value={editedFields[index]?.address || therapist.address}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.address
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='hoursOfWork'
-                      value={
-                        editedFields[index]?.hoursOfWork ||
-                        therapist.hoursOfWork
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.hoursOfWork
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='workLocation'
-                      value={
-                        editedFields[index]?.workLocation ||
-                        therapist.workLocation
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.workLocation
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='timeSlot'
-                      value={
-                        editedFields[index]?.timeSlot || therapist.timeSlot
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.timeSlot
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      type='number'
-                      name='yearsOfExperience'
-                      value={
-                        editedFields[index]?.yearsOfExperience ||
-                        therapist.yearsOfExperience
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.yearsOfExperience
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='college'
-                      value={editedFields[index]?.college || therapist.college}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.college
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='specialization'
-                      value={
-                        editedFields[index]?.specialization ||
-                        therapist.specialization
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    therapist.specialization || 'N/A'
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <IconButton
-                      aria-label='save'
-                      onClick={() => handleSave(therapist, index)}
-                    >
-                      <Save />
-                    </IconButton>
-                  ) : (
-                    <>
-                      <IconButton
-                        aria-label='edit'
-                        onClick={() => handleEdit(index)}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        aria-label='delete'
-                        onClick={() => handleDelete(therapist)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </>
-                  )}
+                  <IconButton
+                    aria-label='edit'
+                    onClick={() => handleEdit(therapist)}
+                  >
+                    <Edit />
+                  </IconButton>
+                  <IconButton
+                    aria-label='delete'
+                    onClick={() => handleDelete(therapist)}
+                  >
+                    <Delete />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

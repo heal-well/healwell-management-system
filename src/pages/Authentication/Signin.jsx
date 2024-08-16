@@ -19,6 +19,7 @@ const SignIn = () => {
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/')
+      isAuthenticated, navigate
     }
   }, [isAuthenticated, navigate])
 
@@ -42,10 +43,10 @@ const SignIn = () => {
             <div className='hidden w-full xl:block xl:w-1/2'>
               <div className='py-17.5 px-26 text-center'>
                 <h1 className=' text-3xl text-center mx-2 my-2 font-bold  px-2 py-1'>
-                  Invoice Manager
+                  Healwell Manager
                 </h1>
 
-                <p className='2xl:px-20'>Create invoices with ease</p>
+                <p className='2xl:px-20'>A healwell management system</p>
 
                 <span className='mt-15 inline-block'>
                   <svg

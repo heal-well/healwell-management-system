@@ -10,21 +10,14 @@ import {
   Paper,
   Button,
   IconButton,
-  Box,
-  TextField,
-  MenuItem,
-  Select,
-  FormControlLabel,
-  Checkbox
+  Box
 } from '@mui/material'
-import { Edit, Delete, Add, Save } from '@mui/icons-material'
+import { Edit, Delete, Add } from '@mui/icons-material'
 import axios from 'axios'
 
-const PatientsTable = ({ fetchData }) => {
+const PatientsTable = () => {
   const navigate = useNavigate()
 
-  const [editMode, setEditMode] = useState(null)
-  const [editedFields, setEditedFields] = useState({})
   const [patients, setPatients] = useState([])
 
   useEffect(() => {
@@ -42,36 +35,8 @@ const PatientsTable = ({ fetchData }) => {
     }
   }
 
-  const handleChange = (e, index) => {
-    const { name, value, checked, type } = e.target
-    setEditedFields(prevFields => ({
-      ...prevFields,
-      [index]: {
-        ...prevFields[index],
-        [name]: type === 'checkbox' ? checked : value
-      }
-    }))
-  }
-
-  const handleEdit = index => {
-    setEditMode(index)
-    setEditedFields({ ...editedFields, [index]: { ...patients[index] } })
-  }
-
-  const handleSave = async (patient, index) => {
-    try {
-      const patientId = patient._id
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/patients/${patientId}`,
-        editedFields[index]
-      )
-      console.log('Data saved: ', response.data)
-      setEditMode(null)
-      setEditedFields({})
-      fetchPatients()
-    } catch (error) {
-      console.error('Error saving data: ', error)
-    }
+  const handleEdit = patient => {
+    navigate(`/patients/edit/${patient._id}`, { state: { patient } })
   }
 
   const handleDelete = async patient => {
@@ -123,7 +88,7 @@ const PatientsTable = ({ fetchData }) => {
               <TableCell>Pain Area</TableCell>
               <TableCell>Surgeries</TableCell>
               <TableCell>Date of Injury</TableCell>
-              <TableCell>Pacemaker</TableCell> {/* Updated */}
+              <TableCell>Pacemaker</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -131,155 +96,30 @@ const PatientsTable = ({ fetchData }) => {
             {patients.map((patient, index) => (
               <TableRow key={index}>
                 <TableCell>{patient.patientId}</TableCell>
+                <TableCell>{patient.name}</TableCell>
+                <TableCell>{patient.age}</TableCell>
+                <TableCell>{patient.sex}</TableCell>
+                <TableCell>{patient.phone}</TableCell>
+                <TableCell>{patient.address}</TableCell>
+                <TableCell>{patient.painArea}</TableCell>
+                <TableCell>{patient.surgeries}</TableCell>
                 <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='name'
-                      value={editedFields[index]?.name || patient.name}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    patient.name
-                  )}
+                  {new Date(patient.dateOfInjury).toLocaleDateString()}
                 </TableCell>
+                <TableCell>{patient.isPacemaker ? 'Yes' : 'No'}</TableCell>
                 <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      type='number'
-                      name='age'
-                      value={editedFields[index]?.age || patient.age}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    patient.age
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <Select
-                      name='sex'
-                      value={editedFields[index]?.sex || patient.sex}
-                      onChange={e => handleChange(e, index)}
-                    >
-                      <MenuItem value='Male'>Male</MenuItem>
-                      <MenuItem value='Female'>Female</MenuItem>
-                    </Select>
-                  ) : (
-                    patient.sex
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      type='number'
-                      name='phone'
-                      value={editedFields[index]?.phone || patient.phone}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    patient.phone
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='address'
-                      value={editedFields[index]?.address || patient.address}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    patient.address
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='painArea'
-                      value={editedFields[index]?.painArea || patient.painArea}
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    patient.painArea
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      name='surgeries'
-                      value={
-                        editedFields[index]?.surgeries || patient.surgeries
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    patient.surgeries
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <TextField
-                      type='date'
-                      name='dateOfInjury'
-                      value={
-                        editedFields[index]?.dateOfInjury
-                          ? new Date(editedFields[index].dateOfInjury)
-                              .toISOString()
-                              .split('T')[0]
-                          : new Date(patient.dateOfInjury)
-                              .toISOString()
-                              .split('T')[0]
-                      }
-                      onChange={e => handleChange(e, index)}
-                    />
-                  ) : (
-                    new Date(patient.dateOfInjury).toLocaleDateString()
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          name='isPacemaker'
-                          checked={
-                            editedFields[index]?.isPacemaker ||
-                            patient.isPacemaker
-                          }
-                          onChange={e => handleChange(e, index)}
-                        />
-                      }
-                      label='Is Pacemaker'
-                    />
-                  ) : patient.isPacemaker ? (
-                    'Yes'
-                  ) : (
-                    'No'
-                  )}
-                </TableCell>
-                <TableCell>
-                  {editMode === index ? (
-                    <IconButton
-                      aria-label='save'
-                      onClick={() => handleSave(patient, index)}
-                    >
-                      <Save />
-                    </IconButton>
-                  ) : (
-                    <>
-                      <IconButton
-                        aria-label='edit'
-                        onClick={() => handleEdit(index)}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        aria-label='delete'
-                        onClick={() => handleDelete(patient)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </>
-                  )}
+                  <IconButton
+                    aria-label='edit'
+                    onClick={() => handleEdit(patient)}
+                  >
+                    <Edit />
+                  </IconButton>
+                  <IconButton
+                    aria-label='delete'
+                    onClick={() => handleDelete(patient)}
+                  >
+                    <Delete />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Button,
   TextField,
@@ -13,7 +13,7 @@ import {
   MenuItem
 } from '@mui/material'
 import { useForm, Controller } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 import DefaultLayout from '../../layout/DefaultLayout'
 import axios from 'axios'
@@ -22,6 +22,9 @@ import 'react-toastify/dist/ReactToastify.css'
 
 const CreateTherapistsTable = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { id } = useParams()
+  const therapistData = location.state?.therapist || {}
   const {
     register,
     handleSubmit,
@@ -30,19 +33,52 @@ const CreateTherapistsTable = () => {
   } = useForm()
 
   const [createdTherapistId, setCreatedTherapistId] = useState(null)
+  const [formData, setFormData] = useState({
+    therapistId: therapistData.therapistId || '',
+    firstName: therapistData.firstName || '',
+    lastName: therapistData.lastName || '',
+    phone: therapistData.phone || '',
+    address: therapistData.address || '',
+    hoursOfWork: therapistData.hoursOfWork || '',
+    workLocation: therapistData.workLocation || '',
+    timeSlot: therapistData.timeSlot || '',
+    college: therapistData.college || '',
+    specialization: therapistData.specialization || '',
+    yearsOfExperience: therapistData.yearsOfExperience || ''
+  })
+
+  useEffect(() => {
+    if (id) {
+      setFormData(therapistData)
+    }
+  }, [id, therapistData])
+
+  const handleChange = e => {
+    const { name, value } = e.target
+    setFormData({
+      ...formData,
+      [name]: value
+    })
+  }
 
   const onSubmit = async data => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/therapists`,
-        data
-      )
-      console.log('response: ', response)
-      if (response) {
-        setCreatedTherapistId(response.data.therapistId)
-        console.log('Data created: ', response.data)
-        toast.success('Therapist created successfully')
+      if (id) {
+        await axios.put(
+          `${import.meta.env.VITE_API_URL}/api/therapists/${id}`,
+          data
+        )
+        toast.success('Therapist updated successfully')
         navigate('/')
+      } else {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/therapists`, data)
+        console.log('response: ', response)
+        if (response) {
+          setCreatedTherapistId(response.data.therapistId)
+          console.log('Data created: ', response.data)
+          toast.success('Therapist created successfully')
+          navigate('/')
+        }
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
@@ -76,7 +112,7 @@ const CreateTherapistsTable = () => {
         >
           <div className='flex justify-between items-center'>
             <Typography variant='h5' gutterBottom>
-              Create Therapist
+              {id ? 'Edit Therapist' : 'Create Therapist'}
             </Typography>
             <IconButton onClick={() => navigate('/')} aria-label='Close'>
               <CloseIcon />
@@ -98,6 +134,7 @@ const CreateTherapistsTable = () => {
                   variant='outlined'
                   fullWidth
                   error={!!errors.firstName}
+                  value={formData.firstName}
                   helperText={errors.firstName ? 'First name is required' : ''}
                 />
               </Grid>
@@ -108,6 +145,7 @@ const CreateTherapistsTable = () => {
                   variant='outlined'
                   fullWidth
                   error={!!errors.lastName}
+                  value={formData.lastName}
                   helperText={errors.lastName ? 'Last name is required' : ''}
                 />
               </Grid>
@@ -118,6 +156,7 @@ const CreateTherapistsTable = () => {
                   variant='outlined'
                   fullWidth
                   error={!!errors.college}
+                  value={formData.college}
                   helperText={errors.college ? 'College is required' : ''}
                 />
               </Grid>
@@ -128,6 +167,7 @@ const CreateTherapistsTable = () => {
                   variant='outlined'
                   fullWidth
                   error={!!errors.hoursOfWork}
+                  value={formData.hoursOfWork}
                   helperText={
                     errors.hoursOfWork ? 'Hours of work are required' : ''
                   }
@@ -171,6 +211,7 @@ const CreateTherapistsTable = () => {
                   {...register('languages', { required: true })}
                   label='Languages'
                   variant='outlined'
+                  value={formData.languages}
                   fullWidth
                   error={!!errors.languages}
                   helperText={errors.languages ? 'Languages are required' : ''}
@@ -181,6 +222,7 @@ const CreateTherapistsTable = () => {
                   {...register('phone', { required: true })}
                   label='Phone'
                   variant='outlined'
+                  value={formData.phone}
                   fullWidth
                   error={!!errors.phone}
                   helperText={errors.phone ? 'Phone is required' : ''}
@@ -192,6 +234,7 @@ const CreateTherapistsTable = () => {
                   label='Specialization'
                   variant='outlined'
                   fullWidth
+                  value={formData.specialization}
                   error={!!errors.specialization}
                   helperText={
                     errors.specialization ? 'Specialization is required' : ''
@@ -203,6 +246,7 @@ const CreateTherapistsTable = () => {
                   {...register('workLocation', { required: true })}
                   label='Work Location'
                   variant='outlined'
+                  value={formData.workLocation}
                   fullWidth
                   error={!!errors.workLocation}
                   helperText={
@@ -215,6 +259,7 @@ const CreateTherapistsTable = () => {
                   {...register('yearsOfExperience', { required: true })}
                   label='Years of Experience'
                   variant='outlined'
+                  value={formData.yearsOfExperience}
                   fullWidth
                   error={!!errors.yearsOfExperience}
                   helperText={
@@ -230,6 +275,7 @@ const CreateTherapistsTable = () => {
                   label='Address'
                   variant='outlined'
                   fullWidth
+                  value={formData.address}
                   error={!!errors.address}
                   helperText={errors.address ? 'Address is required' : ''}
                 />
@@ -241,7 +287,7 @@ const CreateTherapistsTable = () => {
               variant='contained'
               sx={{ alignSelf: 'flex-end', mt: 2 }}
             >
-              Create
+              {id ? 'Update' : 'Create'}
             </Button>
           </Box>
           {createdTherapistId && (

@@ -263,13 +263,6 @@ const SessionTable = ({ treatments, fetchData }) => {
                         }
                         onChange={e => handleChange(e, index)}
                       />
-                      <IconButton
-                        onClick={() =>
-                          handleIncrementDaysAttended(treatment, index)
-                        }
-                      >
-                        <AddCircle />
-                      </IconButton>
                     </>
                   ) : (
                     <>
@@ -310,14 +303,20 @@ const SessionTable = ({ treatments, fetchData }) => {
                       }
                       onChange={e => handleChange(e, index)}
                     >
+                      <MenuItem value=''>
+                        <em>None</em>
+                      </MenuItem>
                       {therapists.map(therapist => (
                         <MenuItem key={therapist._id} value={therapist._id}>
-                          {therapist.name}
+                          {therapist.firstName} {therapist.lastName} (
+                          {therapist.therapistId})
                         </MenuItem>
                       ))}
                     </Select>
+                  ) : treatment.substitutedBy ? (
+                    `${treatment.substitutedBy.firstName} ${treatment.substitutedBy.lastName} (${treatment.substitutedBy.therapistId})`
                   ) : (
-                    treatment.substitutedBy?.name || 'N/A'
+                    'N/A'
                   )}
                 </TableCell>
                 <TableCell>
