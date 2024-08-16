@@ -65,7 +65,13 @@ export const updateTreatmentById = async (req, res) => {
     const { patientId, therapistId, substitutedBy } = req.body
     const id = req.params.id
 
-    const treatment = await Treatment.findByIdAndUpdate(id, req.body, {
+    // Set substitutedBy to null if it's an empty string
+    const updateData = { ...req.body }
+    if (substitutedBy === '') {
+      updateData.substitutedBy = null
+    }
+
+    const treatment = await Treatment.findByIdAndUpdate(id, updateData, {
       new: true
     })
 
@@ -81,9 +87,9 @@ export const updateTreatmentById = async (req, res) => {
     )
 
     // Update the substitute therapist's patientsTreated field, if applicable
-    if (substitutedBy) {
+    if (updateData.substitutedBy) {
       await Therapists.findByIdAndUpdate(
-        substitutedBy,
+        updateData.substitutedBy,
         { $addToSet: { patientsTreated: patientId } },
         { new: true }
       )

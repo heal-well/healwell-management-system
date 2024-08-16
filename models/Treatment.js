@@ -32,7 +32,7 @@ const treatmentSchema = new mongoose.Schema({
   substitutedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Therapists',
-    required: false
+    default: null
   },
   treatmentStatus: {
     type: String,
