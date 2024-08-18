@@ -71,7 +71,10 @@ const CreateTherapistsTable = () => {
         toast.success('Therapist updated successfully')
         navigate('/')
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/therapists`, data)
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/therapists`,
+          data
+        )
         console.log('response: ', response)
         if (response) {
           setCreatedTherapistId(response.data.therapistId)
@@ -135,6 +138,7 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   error={!!errors.firstName}
                   value={formData.firstName}
+                  onChange={handleChange}
                   helperText={errors.firstName ? 'First name is required' : ''}
                 />
               </Grid>
@@ -146,6 +150,7 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   error={!!errors.lastName}
                   value={formData.lastName}
+                  onChange={handleChange}
                   helperText={errors.lastName ? 'Last name is required' : ''}
                 />
               </Grid>
@@ -156,6 +161,7 @@ const CreateTherapistsTable = () => {
                   variant='outlined'
                   fullWidth
                   error={!!errors.college}
+                  onChange={handleChange}
                   value={formData.college}
                   helperText={errors.college ? 'College is required' : ''}
                 />
@@ -166,6 +172,7 @@ const CreateTherapistsTable = () => {
                   label='Hours of Work'
                   variant='outlined'
                   fullWidth
+                  onChange={handleChange}
                   error={!!errors.hoursOfWork}
                   value={formData.hoursOfWork}
                   helperText={
@@ -212,6 +219,7 @@ const CreateTherapistsTable = () => {
                   label='Languages'
                   variant='outlined'
                   value={formData.languages}
+                  onChange={handleChange}
                   fullWidth
                   error={!!errors.languages}
                   helperText={errors.languages ? 'Languages are required' : ''}
@@ -223,6 +231,7 @@ const CreateTherapistsTable = () => {
                   label='Phone'
                   variant='outlined'
                   value={formData.phone}
+                  onChange={handleChange}
                   fullWidth
                   error={!!errors.phone}
                   helperText={errors.phone ? 'Phone is required' : ''}
@@ -233,6 +242,7 @@ const CreateTherapistsTable = () => {
                   {...register('specialization', { required: true })}
                   label='Specialization'
                   variant='outlined'
+                  onChange={handleChange}
                   fullWidth
                   value={formData.specialization}
                   error={!!errors.specialization}
@@ -249,6 +259,7 @@ const CreateTherapistsTable = () => {
                   value={formData.workLocation}
                   fullWidth
                   error={!!errors.workLocation}
+                  onChange={handleChange}
                   helperText={
                     errors.workLocation ? 'Work location is required' : ''
                   }
@@ -261,6 +272,7 @@ const CreateTherapistsTable = () => {
                   variant='outlined'
                   value={formData.yearsOfExperience}
                   fullWidth
+                  onChange={handleChange}
                   error={!!errors.yearsOfExperience}
                   helperText={
                     errors.yearsOfExperience
@@ -277,6 +289,7 @@ const CreateTherapistsTable = () => {
                   fullWidth
                   value={formData.address}
                   error={!!errors.address}
+                  onChange={handleChange}
                   helperText={errors.address ? 'Address is required' : ''}
                 />
               </Grid>
