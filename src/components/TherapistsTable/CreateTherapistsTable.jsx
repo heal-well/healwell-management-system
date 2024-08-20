@@ -25,74 +25,83 @@ const CreateTherapistsTable = () => {
   const location = useLocation()
   const { id } = useParams()
   const therapistData = location.state?.therapist || {}
+  const [timeSlots, setTimeSlots] = useState(therapistData.timeSlots || [])
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors }
-  } = useForm()
-
-  const [createdTherapistId, setCreatedTherapistId] = useState(null)
-  const [formData, setFormData] = useState({
-    therapistId: therapistData.therapistId || '',
-    firstName: therapistData.firstName || '',
-    lastName: therapistData.lastName || '',
-    phone: therapistData.phone || '',
-    address: therapistData.address || '',
-    hoursOfWork: therapistData.hoursOfWork || '',
-    workLocation: therapistData.workLocation || '',
-    timeSlot: therapistData.timeSlot || '',
-    college: therapistData.college || '',
-    specialization: therapistData.specialization || '',
-    yearsOfExperience: therapistData.yearsOfExperience || ''
+  } = useForm({
+    defaultValues: {
+      therapistId: therapistData.therapistId || '',
+      firstName: therapistData.firstName || '',
+      lastName: therapistData.lastName || '',
+      phone: therapistData.phone || '',
+      address: therapistData.address || '',
+      hoursOfWork: therapistData.hoursOfWork || '',
+      workLocation: therapistData.workLocation || '',
+      timeSlot: therapistData.timeSlot || '',
+      fromTime: therapistData.fromTime || '',
+      toTime: therapistData.toTime || '',
+      languages: therapistData.languages || '',
+      college: therapistData.college || '',
+      specialization: therapistData.specialization || '',
+      yearsOfExperience: therapistData.yearsOfExperience || ''
+    }
   })
 
   useEffect(() => {
     if (id) {
-      setFormData(therapistData)
+      setTimeSlots(therapistData.timeSlots || [])
     }
   }, [id, therapistData])
 
-  const handleChange = e => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value
-    })
+  const handleAddTimeSlot = () => {
+    setTimeSlots([...timeSlots, { slot: '', fromTime: '', toTime: '' }])
+  }
+
+  const handleTimeSlotChange = (index, name, value) => {
+    const updatedTimeSlots = [...timeSlots]
+    updatedTimeSlots[index][name] = value
+    setTimeSlots(updatedTimeSlots)
   }
 
   const onSubmit = async data => {
     try {
+      data.timeSlots = timeSlots
+
       if (id) {
-        await axios.put(
+        const response = await axios.put(
           `${import.meta.env.VITE_API_URL}/api/therapists/${id}`,
           data
         )
-        toast.success('Therapist updated successfully')
-        navigate('/')
+
+        if (response.status === 200) {
+          toast.success('Therapist updated successfully')
+        } else {
+          toast.error('Failed to update therapist')
+        }
       } else {
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/therapists`,
           data
         )
-        console.log('response: ', response)
-        if (response) {
-          setCreatedTherapistId(response.data.therapistId)
-          console.log('Data created: ', response.data)
+
+        if (response.status === 201 || response.status === 200) {
           toast.success('Therapist created successfully')
-          navigate('/')
+        } else {
+          toast.error('Failed to create therapist')
         }
       }
+
+      navigate('/')
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        toast.error('Therapist with this phone number already exists')
-      } else {
-        toast.error('Error creating therapist')
-      }
-      console.error('Error creating data: ', error)
+      const errorMsg =
+        error.response?.data?.message || 'Error creating or updating therapist'
+      toast.error(errorMsg)
     }
   }
-
   return (
     <DefaultLayout>
       <ToastContainer />
@@ -122,7 +131,6 @@ const CreateTherapistsTable = () => {
             </IconButton>
           </div>
           <Box
-            className='my-2 mx-2 py-2 px-1'
             component='form'
             onSubmit={handleSubmit(onSubmit)}
             sx={{
@@ -132,182 +140,178 @@ const CreateTherapistsTable = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('firstName', { required: true })}
+                  {...register('firstName', {
+                    required: 'First name is required'
+                  })}
                   label='First Name'
                   variant='outlined'
                   fullWidth
                   error={!!errors.firstName}
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  helperText={errors.firstName ? 'First name is required' : ''}
+                  helperText={errors.firstName?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('lastName', { required: true })}
+                  {...register('lastName', {
+                    required: 'Last name is required'
+                  })}
                   label='Last Name'
                   variant='outlined'
                   fullWidth
                   error={!!errors.lastName}
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  helperText={errors.lastName ? 'Last name is required' : ''}
+                  helperText={errors.lastName?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('college', { required: true })}
+                  {...register('college', { required: 'College is required' })}
                   label='College'
                   variant='outlined'
                   fullWidth
                   error={!!errors.college}
-                  onChange={handleChange}
-                  value={formData.college}
-                  helperText={errors.college ? 'College is required' : ''}
+                  helperText={errors.college?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('hoursOfWork', { required: true })}
+                  {...register('hoursOfWork', {
+                    required: 'Hours of work are required'
+                  })}
                   label='Hours of Work'
                   variant='outlined'
                   fullWidth
-                  onChange={handleChange}
                   error={!!errors.hoursOfWork}
-                  value={formData.hoursOfWork}
-                  helperText={
-                    errors.hoursOfWork ? 'Hours of work are required' : ''
-                  }
+                  helperText={errors.hoursOfWork?.message}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel id='timeslot-label'>Time Slot</InputLabel>
-                  <Controller
-                    name='timeSlot'
-                    control={control}
-                    defaultValue='none'
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <Select
-                        labelId='timeslot-label'
-                        label='Time Slot'
-                        {...field}
-                        error={!!errors.timeSlot}
-                      >
-                        <MenuItem value='6AM-8AM'>6AM-8AM</MenuItem>
-                        <MenuItem value='8AM-10AM'>8AM-10AM</MenuItem>
-                        <MenuItem value='10AM-12PM'>10AM-12PM</MenuItem>
-                        <MenuItem value='12PM-2PM'>12PM-2PM</MenuItem>
-                        <MenuItem value='2PM-4PM'>2PM-4PM</MenuItem>
-                        <MenuItem value='4PM-6PM'>4PM-6PM</MenuItem>
-                        <MenuItem value='6PM-8PM'>6PM-8PM</MenuItem>
-                        <MenuItem value='8PM-10PM'>8PM-10PM</MenuItem>
-                      </Select>
-                    )}
-                  />
-                  {errors.timeSlot && (
-                    <Typography color='error'>
-                      {errors.timeSlot.message}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Grid>
+
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('languages', { required: true })}
+                  {...register('languages', {
+                    required: 'Languages are required'
+                  })}
                   label='Languages'
                   variant='outlined'
-                  value={formData.languages}
-                  onChange={handleChange}
                   fullWidth
                   error={!!errors.languages}
-                  helperText={errors.languages ? 'Languages are required' : ''}
+                  helperText={errors.languages?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('phone', { required: true })}
+                  {...register('phone', { required: 'Phone is required' })}
                   label='Phone'
                   variant='outlined'
-                  value={formData.phone}
-                  onChange={handleChange}
                   fullWidth
                   error={!!errors.phone}
-                  helperText={errors.phone ? 'Phone is required' : ''}
+                  helperText={errors.phone?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('specialization', { required: true })}
+                  {...register('specialization', {
+                    required: 'Specialization is required'
+                  })}
                   label='Specialization'
                   variant='outlined'
-                  onChange={handleChange}
                   fullWidth
-                  value={formData.specialization}
                   error={!!errors.specialization}
-                  helperText={
-                    errors.specialization ? 'Specialization is required' : ''
-                  }
+                  helperText={errors.specialization?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('workLocation', { required: true })}
+                  {...register('workLocation', {
+                    required: 'Work location is required'
+                  })}
                   label='Work Location'
                   variant='outlined'
-                  value={formData.workLocation}
                   fullWidth
                   error={!!errors.workLocation}
-                  onChange={handleChange}
-                  helperText={
-                    errors.workLocation ? 'Work location is required' : ''
-                  }
+                  helperText={errors.workLocation?.message}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('yearsOfExperience', { required: true })}
+                  {...register('yearsOfExperience', {
+                    required: 'Years of experience is required'
+                  })}
                   label='Years of Experience'
                   variant='outlined'
-                  value={formData.yearsOfExperience}
                   fullWidth
-                  onChange={handleChange}
                   error={!!errors.yearsOfExperience}
-                  helperText={
-                    errors.yearsOfExperience
-                      ? 'Years of experience are required'
-                      : ''
-                  }
+                  helperText={errors.yearsOfExperience?.message}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <TextField
-                  {...register('address', { required: true })}
+                  {...register('address', { required: 'Address is required' })}
                   label='Address'
                   variant='outlined'
                   fullWidth
-                  value={formData.address}
                   error={!!errors.address}
-                  onChange={handleChange}
-                  helperText={errors.address ? 'Address is required' : ''}
+                  helperText={errors.address?.message}
                 />
               </Grid>
+
+              {/* Time Slots */}
+              {timeSlots.map((slot, index) => (
+                <Grid item xs={12} key={index} container spacing={2}>
+                  <Grid item xs={4}>
+                    <FormControl fullWidth variant='outlined'>
+                      <InputLabel>Time Slot</InputLabel>
+                      <Select
+                        value={slot.slot}
+                        onChange={e =>
+                          handleTimeSlotChange(index, 'slot', e.target.value)
+                        }
+                        label='Time Slot'
+                      >
+                        <MenuItem value='morning'>Morning</MenuItem>
+                        <MenuItem value='afternoon'>Afternoon</MenuItem>
+                        <MenuItem value='evening'>Evening</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label='From Time'
+                      variant='outlined'
+                      fullWidth
+                      value={slot.fromTime}
+                      onChange={e =>
+                        handleTimeSlotChange(index, 'fromTime', e.target.value)
+                      }
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label='To Time'
+                      variant='outlined'
+                      fullWidth
+                      value={slot.toTime}
+                      onChange={e =>
+                        handleTimeSlotChange(index, 'toTime', e.target.value)
+                      }
+                    />
+                  </Grid>
+                </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Button
+                  onClick={handleAddTimeSlot}
+                  variant='contained'
+                  sx={{ marginBottom: '5px' }}
+                >
+                  Add Time Slot
+                </Button>
+              </Grid>
             </Grid>
-            <Button
-              type='submit'
-              color='primary'
-              variant='contained'
-              sx={{ alignSelf: 'flex-end', mt: 2 }}
-            >
-              {id ? 'Update' : 'Create'}
+
+            <Button variant='contained' color='primary' type='submit'>
+              {id ? 'Update Therapist' : 'Create Therapist'}
             </Button>
           </Box>
-          {createdTherapistId && (
-            <Typography variant='h6' color='primary' sx={{ mt: 2 }}>
-              Therapist created successfully! ID: {createdTherapistId}
-            </Typography>
-          )}
         </Paper>
       </Box>
     </DefaultLayout>

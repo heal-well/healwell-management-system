@@ -10,10 +10,9 @@ import {
   Paper,
   Button,
   IconButton,
-  Box,
-  TextField
+  Box
 } from '@mui/material'
-import { Edit, Delete, Add, Save } from '@mui/icons-material'
+import { Edit, Delete, Add } from '@mui/icons-material'
 import axios from 'axios'
 
 const TherapistsTable = ({ fetchData }) => {
@@ -102,13 +101,13 @@ const TherapistsTable = ({ fetchData }) => {
           <TableHead>
             <TableRow>
               <TableCell>Id</TableCell>
-              <TableCell>First name</TableCell>
-              <TableCell>Last name</TableCell>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
               <TableCell>Phone</TableCell>
               <TableCell>Address</TableCell>
               <TableCell>Hours of Work</TableCell>
               <TableCell>Work Location</TableCell>
-              <TableCell>Time Slot</TableCell>
+              <TableCell>Time Slots</TableCell>
               <TableCell>Years of Experience</TableCell>
               <TableCell>College</TableCell>
               <TableCell>Specialization</TableCell>
@@ -125,7 +124,15 @@ const TherapistsTable = ({ fetchData }) => {
                 <TableCell>{therapist.address}</TableCell>
                 <TableCell>{therapist.hoursOfWork}</TableCell>
                 <TableCell>{therapist.workLocation}</TableCell>
-                <TableCell>{therapist.timeSlot}</TableCell>
+                <TableCell>
+                  {therapist.timeSlots && therapist.timeSlots.length > 0
+                    ? therapist.timeSlots.map((slot, index) => (
+                        <div key={index}>
+                          {slot.slot} ({slot.fromTime} - {slot.toTime})
+                        </div>
+                      ))
+                    : 'N/A'}
+                </TableCell>
                 <TableCell>{therapist.yearsOfExperience}</TableCell>
                 <TableCell>{therapist.college}</TableCell>
                 <TableCell>{therapist.specialization || 'N/A'}</TableCell>
