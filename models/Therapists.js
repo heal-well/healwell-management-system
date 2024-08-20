@@ -1,5 +1,16 @@
 import mongoose from 'mongoose'
-
+const timeSlotSchema = new mongoose.Schema({
+  slot: {
+    type: String,
+    required: true
+  },
+  fromTime: {
+    type: String
+  },
+  toTime: {
+    type: String
+  }
+})
 const therapistsSchema = new mongoose.Schema({
   therapistId: {
     type: String,
@@ -35,9 +46,15 @@ const therapistsSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  timeSlot: {
-    type: String,
-    required: true
+  timeSlots: [timeSlotSchema],
+  morningTime: {
+    type: String
+  },
+  afternoonTime: {
+    type: String
+  },
+  eveningTime: {
+    type: String
   },
   yearsOfExperience: {
     type: Number,
