@@ -45,17 +45,29 @@ const patientsSchema = new mongoose.Schema({
   }
 })
 
+// Pre-save hook for generating unique patientId
 patientsSchema.pre('save', async function (next) {
   if (this.isNew) {
-    const initials =
-      this.name.charAt(0).toUpperCase() + this.name.charAt(1)?.toUpperCase()
-    const date = new Date()
-    const year = date.getFullYear().toString()
+    // Get first two characters from the first name, in uppercase
+    const initials = this.name.trim().substring(0, 2).toUpperCase()
+    const year = new Date().getFullYear().toString()
+
     try {
-      const count = await mongoose.model('Patients').countDocuments({
-        patientId: new RegExp(`^${year}-\\d{4}i-${initials}`)
-      })
-      const idNumber = (count + 1).toString().padStart(4, '0')
+      // Find the last patient with matching initials and year
+      const lastPatient = await mongoose
+        .model('Patients')
+        .findOne({
+          patientId: new RegExp(`^${year}-\\d{4}-${initials}$`)
+        })
+        .sort({ patientId: -1 })
+
+      let idNumber = '0001' // Default ID number if no match found
+
+      if (lastPatient) {
+        const lastIdNumber = lastPatient.patientId.split('-')[1]
+        idNumber = (parseInt(lastIdNumber) + 1).toString().padStart(4, '0')
+      }
+
       this.patientId = `${year}-${idNumber}-${initials}`
       next()
     } catch (error) {

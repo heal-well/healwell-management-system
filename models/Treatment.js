@@ -25,6 +25,10 @@ const treatmentSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  weeksAttended: {
+    type: Number,
+    required: true
+  },
   daysSubstituted: {
     type: Number,
     required: true
