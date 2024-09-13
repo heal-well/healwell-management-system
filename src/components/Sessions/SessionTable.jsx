@@ -138,7 +138,32 @@ const SessionTable = ({ treatments, fetchData }) => {
       console.error('Error incrementing days attended: ', error)
     }
   }
+  const handleIncrementWeeksAttended = async (treatment, index) => {
+    try {
+      const treatmentId = treatment._id
+      const therapistId = treatment.therapistId?._id
 
+      const updatedTreatment = {
+        ...treatment,
+        weeksAttended: (treatment.weeksAttended || 0) + 1
+      }
+
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/treatments/${treatmentId}`,
+        updatedTreatment
+      )
+
+      if (therapistId) {
+        const therapistResponse = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/therapists/${therapistId}`
+        )
+      }
+
+      fetchData()
+    } catch (error) {
+      console.error('Error incrementing days attended: ', error)
+    }
+  }
   return (
     <>
       <Box
@@ -167,6 +192,7 @@ const SessionTable = ({ treatments, fetchData }) => {
               <TableCell>Treatment Date</TableCell>
               <TableCell>Treatment Type</TableCell>
               <TableCell>Days Attended</TableCell>
+              <TableCell>Weeks Attended</TableCell>
               <TableCell>Days Substituted</TableCell>
               <TableCell>Substituted By</TableCell>
               <TableCell>Actions</TableCell>
@@ -270,6 +296,32 @@ const SessionTable = ({ treatments, fetchData }) => {
                       <IconButton
                         onClick={() =>
                           handleIncrementDaysAttended(treatment, index)
+                        }
+                      >
+                        <AddCircle />
+                      </IconButton>
+                    </>
+                  )}
+                </TableCell>
+                <TableCell>
+                  {editMode === index ? (
+                    <>
+                      <TextField
+                        type='number'
+                        name='weeksAttended'
+                        value={
+                          editedFields[index]?.weeksAttended ||
+                          treatment.weeksAttended
+                        }
+                        onChange={e => handleChange(e, index)}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {treatment.weeksAttended}
+                      <IconButton
+                        onClick={() =>
+                          handleIncrementWeeksAttended(treatment, index)
                         }
                       >
                         <AddCircle />

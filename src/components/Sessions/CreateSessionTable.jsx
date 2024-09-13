@@ -218,6 +218,18 @@ const CreateSessionTable = () => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  {...register('weeksAttended', { required: true })}
+                  label='Weeks Attended'
+                  variant='outlined'
+                  fullWidth
+                  error={!!errors.weeksAttended}
+                  helperText={
+                    errors.weeksAttended ? 'Weeks Attended is required' : ''
+                  }
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
                   {...register('daysSubstituted', { required: true })}
                   label='Days Substituted'
                   variant='outlined'
